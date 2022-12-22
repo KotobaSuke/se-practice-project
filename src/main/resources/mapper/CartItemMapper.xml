@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.medicaldistributionsystem.dao.CartItemMapper">
+    <resultMap id="BaseResultMap" type="com.example.medicaldistributionsystem.entity.CartItem">
+        <id column="id" jdbcType="INTEGER" property="cartItemId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="pid" jdbcType="INTEGER" property="goodsId"/>
+        <result column="quantity" jdbcType="INTEGER" property="goodsCount"/>
+        <result column="name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="price" jdbcType="INTEGER" property="goodsPrice"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, goods_id, quantity, name, price
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cart
+        where id = #{cartItemId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByUserIdAndGoodsId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cart
+        where user_id = #{userId,jdbcType=INTEGER} and goods_id=#{goodsId,jdbcType=INTEGER}
+        limit 1
+    </select>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cart
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUserIdAndCartItemIds" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cart
+        where
+        id in
+        <foreach item="id" collection="cartItemIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectCountByUserId" resultType="int">
+        select
+            count(*)
+        from cart
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from cart
+        where id = #{cartItemId,jdbcType=INTEGER}
+    </update>
+    <update id="deleteBatch">
+        delete from cart
+        where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <insert id="insert" parameterType="lcom.example.medicaldistributionsystem.entity.CartItem">
+        insert into cart (id, user_id, goods_id,
+                          quantity, name, price)
+        values (#{cartItemId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER},
+                #{goodsCount,jdbcType=INTEGER}, #{goodsName,jdbcType=INTEGER}, #{goodsPrice,jdbcType=INTEGER}
+               )
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.medicaldistributionsystem.entity.CartItem">
+        insert into cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cartItemId != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="goodsId != null">
+                goods_id,
+            </if>
+            <if test="goodsCount != null">
+                quantity,
+            </if>
+            <if test="goodsName != null">
+                name,
+            </if>
+            <if test="goodsPrice != null">
+                price,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cartItemId != null">
+                #{cartItemId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsId != null">
+                #{goodsId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsCount != null">
+                #{goodsCount,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                #{goodsName,jdbcType=INTEGER},
+            </if>
+            <if test="goodsPrice != null">
+                #{goodsPrice,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.medicaldistributionsystem.entity.CartItem">
+        update cart
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsId != null">
+                goods_id = #{goodsId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsCount != null">
+                quantity = #{goodsCount,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                name = #{goodsName,jdbcType=INTEGER},
+            </if>
+            <if test="goodsPrice != null">
+                price = #{goodsPrice,jdbcType=INTEGER},
+            </if>
+
+        </set>
+        where id = #{cartItemId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.example.medicaldistributionsystem.entity.CartItem">
+        update cart
+        set user_id = #{userId,jdbcType=INTEGER},
+            goods_id = #{goodsId,jdbcType=INTEGER},
+            quantity = #{goodsCount,jdbcType=INTEGER},
+            name = #{goodsName,jdbcType=INTEGER},
+            price = #{goodsPrice,jdbcType=INTEGER},
+
+            where id = #{cartItemId,jdbcType=INTEGER}
+    </update>
+</mapper>

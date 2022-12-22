@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.medicaldistributionsystem.dao.OrderItemMapper">
+    <resultMap id="BaseResultMap" type="com.example.medicaldistributionsystem.entity.OrderItem">
+        <id column="order_item_id" jdbcType="INTEGER" property="orderItemId"/>
+        <result column="id" jdbcType="INTEGER" property="orderId"/>
+        <result column="name" jdbcType="INTEGER" property="goodsName"/>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+        order_item_id, id,name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_item
+        where order_item_id = #{orderItemId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_item
+        where id = #{orderItemId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByOrderIds" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_item
+        where id
+        in
+        <foreach item="id" collection="orderIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_item
+        where order_item_id = #{orderItemId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insertBatch" parameterType="com.example.medicaldistributionsystem.entity.OrderItem">
+        insert into order_item (id)
+        values
+        <foreach collection="orderItems" item="orderItem" separator=",">
+            (#{orderItem.orderId,jdbcType=INTEGER}, #{orderItem.goodsName,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <insert id="insert" parameterType="com.example.medicaldistributionsystem.entity.OrderItem">
+        insert into order_item (order_item_id, id,name)
+        values (#{orderItemId,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{orderItem.goodsName,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.medicaldistributionsystem.entity.OrderItem">
+        insert into order_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderItemId != null">
+                order_item_id,
+            </if>
+            <if test="orderId != null">
+                id,
+            </if>
+            <if test="goodsName != null">
+                name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderItemId != null">
+                #{orderItemId,jdbcType=INTEGER},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                #{goodsName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.medicaldistributionsystem.entity.OrderItem">
+        update order_item
+        <set>
+            <if test="orderId != null">
+                id = #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="goodsName != null">
+                name= #{goodsName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where order_item_id = #{orderItemId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.example.medicaldistributionsystem.entity.OrderItem">
+        update order_item
+        set id = #{orderId,jdbcType=INTEGER},name= #{goodsName,jdbcType=VARCHAR}
+        where order_item_id = #{orderItemId,jdbcType=INTEGER}
+    </update>
+</mapper>

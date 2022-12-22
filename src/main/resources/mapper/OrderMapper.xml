@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.medicaldistributionsystem.dao.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.example.medicaldistributionsystem.entity.Order">
+        <id column="id" jdbcType="INTEGER" property="orderId"/>
+        <result column="eid" jdbcType="INTEGER" property="deliveryId"/>
+        <result column="uid" jdbcType="INTEGER" property="userId"/>
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+        <result column="address" jdbcType="VARCHAR" property="orderAddress"/>
+        <result column="time" jdbcType="TIMESTAMP" property="orderTime"/>
+        <result column="status" jdbcType="VARCHAR" property="orderStatus"/>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, eid, uid, total_price, address, time, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where id = #{orderId,jdbcType=INTEGER}
+    </select>
+    <select id="selectBydeliveryId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where eid = #{deliveryId,jdbcType=VARCHAR} and is_deleted=0 limit 1
+    </select>
+    <select id="selectByPrimaryKeys" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where id in
+        <foreach collection="orderIds" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+    </select>
+    <select id="findOrderList" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        <where>
+            <if test="deliveryId!=null and deliveryId!=''">
+                and eid = #{deliveryId}
+            </if>
+            <if test="userId!=null and userId!=''">
+                and uid = #{userId}
+            </if>
+            <if test="orderAddress!=null and orderAddress!=''">
+                and address = #{orderAddress}
+            </if>
+            <if test="orderStatus!=null">
+                and status = #{orderStatus}
+            </if>
+
+        </where>
+        order by create_time desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="getTotalOrders" parameterType="Map" resultType="int">
+        select count(*) from orders
+        <where>
+            <if test="deliveryId!=null and deliveryId!=''">
+                and eid = #{deliveryId}
+            </if>
+            <if test="userId!=null and userId!=''">
+                and uid = #{userId}
+            </if>
+            <if test="orderAddress!=null and orderAddress!=''">
+                and address = #{orderAddress}
+            </if>
+            <if test="orderStatus!=null">
+                and status = #{orderStatus}
+            </if>
+
+        </where>
+    </select>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        update orders set is_deleted=1
+        where id = #{orderId,jdbcType=INTEGER} and is_deleted=0
+    </update>
+    <insert id="insert" parameterType="com.example.medicaldistributionsystem.entity.Order">
+        insert into orders (id, eid, uid,
+                            total_price,  address,
+                            time, status
+        )
+        values (#{orderId,jdbcType=INTEGER}, #{deliveryId,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER},
+                #{totalPrice,jdbcType=INTEGER}, #{orderAddress,jdbcType=VARCHAR},
+                #{orderTime,jdbcType=TIMESTAMP}, #{orderStatus,jdbcType=VARCHAR}
+               )
+    </insert>
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="orderId"
+            parameterType="com.example.medicaldistributionsystem.entity.Order">
+        insert into orders
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                id,
+            </if>
+            <if test="deliveryId != null">
+                eid,
+            </if>
+            <if test="userId != null">
+                uid,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+
+            <if test="orderAddress != null">
+                address,
+            </if>
+            <if test="orderTime != null">
+                time,
+            </if>
+            <if test="orderStatus != null">
+                status,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="deliveryId != null">
+                #{deliveryId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=INTEGER},
+            </if>
+
+            <if test="orderAddress != null">
+                #{orderAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTime != null">
+                #{orderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderStatus != null">
+            #{orderStatus,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="deleteOrder">
+        delete from orders
+        where id in
+        <foreach collection="orderIds" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.medicaldistributionsystem.entity.Order">
+        update orders
+        <set>
+            <if test="deliveryId != null">
+                eid = #{deliveryId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                uid = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=INTEGER},
+            </if>
+
+            <if test="orderAddress != null">
+                address = #{orderAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTime != null">
+                time = #{orderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderStatus != null">
+                status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+
+        </set>
+        where id = #{orderId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.example.medicaldistributionsystem.entity.Order">
+        update orders
+        set eid = #{deliveryId,jdbcType=INTEGER},
+            uid = #{userId,jdbcType=INTEGER},
+            total_price = #{totalPrice,jdbcType=INTEGER},
+            address = #{orderAddress,jdbcType=VARCHAR},
+            time = #{orderTime,jdbcType=TIMESTAMP},
+            status = #{orderStatus,jdbcType=VARCHAR}
+        where id = #{orderId,jdbcType=INTEGER}
+    </update>
+</mapper>
