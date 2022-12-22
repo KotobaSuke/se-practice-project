@@ -16,6 +16,4 @@ public class CartItem {
     private String goodsName;
 
     private Integer goodsPrice;
-
-
 }

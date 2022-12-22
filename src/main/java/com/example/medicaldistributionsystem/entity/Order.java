@@ -19,6 +19,4 @@ public class Order {
     private Date orderTime;
 
     private String orderStatus;
-
-
 }
